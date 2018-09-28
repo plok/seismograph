@@ -4,9 +4,9 @@
 
 #include "drawing/skia-opengl.h"
 
-#include "timer-uv.h"
-#include "event-loop-uv.h"
-#include "signal-handler-uv.h"
+#include "app-kit/timer-uv.h"
+#include "app-kit/event-loop-uv.h"
+#include "app-kit/signal-handler-uv.h"
 
 #include "string.h"
 #include <iostream>

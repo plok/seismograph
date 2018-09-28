@@ -1,19 +1,23 @@
 cmake_minimum_required(VERSION 3.10)
-project(tuner)
+project(seismograph)
 
 set(CMAKE_CXX_STANDARD 17)
 
+add_subdirectory("modules/katla/app-kit/")
+add_subdirectory("modules/katla/renderer/")
+
 include(FindPkgConfig)
 pkg_check_modules(GL REQUIRED gl)
-pkg_check_modules(LIBUV REQUIRED libuv)
 
 find_package(glfw3 3.2.0 REQUIRED)
 
-set (skia_path ../../../skia)
-set (skia_output_path ${skia_path}/out/Shared/)
-set (skia_include_base_path ${skia_path}/include)
+SET (skia_path $ENV{SKIA_PATH})
 
-find_library(skia skia ${skia_output_path})
+if (NOT DEFINED skia_path)
+    SET(skia_path ${skia_env_path})
+endif()
+
+set (skia_include_base_path ${skia_path}/include)
 
 set (skia_include_directories
     ${skia_include_base_path}
@@ -26,26 +30,16 @@ set (skia_include_directories
 
 set(sources
     main.cpp
-    event-loop-uv.cpp
-    timer-uv.cpp
-    signal-handler-uv.cpp
-    ../../common/error.cpp
-    ../../common/subject.cpp
-    ../../renderer/drawing/skia-opengl.cpp
-
-    ../../renderer/gpu/opengl/opengl.cpp
-    ../../renderer/gpu/opengl/opengl-window.cpp
-    ../../renderer/gpu/opengl/opengl-window-factory.cpp
 )
 
-add_executable(tuner ${sources})
+add_executable(seismograph ${sources})
 
-target_include_directories(tuner PRIVATE
+target_include_directories(seismograph PRIVATE
     .
-    ..
-    ../../
-    ../../renderer/
-    ../../external/
-    ${skia_include_directories})
+    modules/katla
+    modules/katla/renderer/
+    modules/katla/external/
+    ${skia_include_directories}
+)
 
-target_link_libraries(tuner glfw ${GL_LIBRARIES} ${LIBUV_LIBRARIES} ${skia})
+target_link_libraries(seismograph katla-appkit katla-renderer glfw ${GL_LIBRARIES} ${skia})
