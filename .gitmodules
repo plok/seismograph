@@ -1,0 +1,3 @@
+[submodule "modules/katla"]
+	path = modules/katla
+	url = https://github.com/plok/katla.git
