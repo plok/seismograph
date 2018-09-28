@@ -66,19 +66,27 @@ int main(int argc, char* argv[])
 
     auto initDeviceError = graphicsBackend->initDevice();
 
+    UvTimer timer(&eventLoop);
+    timer.init();
 
     auto closeSubject = std::make_shared<Subject<bool>>();
-    auto closeEvent = std::make_shared<FuncObserver<bool>>([&eventLoop](bool) {
+    auto closeEvent = std::make_shared<FuncObserver<bool>>([&eventLoop, &signalHandler, &timer, &window](bool) {
         std::cout << "close event!" << std::endl << std::flush;
+
+        signalHandler.stop();
+        timer.stop();
         eventLoop.close();
+
+        // TODO on event loop?
+        window->close();
     });
     closeSubject->subscribe(closeEvent);
     window->attachCloseSubject(closeSubject);
 
+    window->init();
     window->show();
 
-    UvTimer timer(&eventLoop);
-    timer.init();
+
     
     SkiaOpenGL skia;
     skia.init();
