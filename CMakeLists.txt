@@ -4,19 +4,14 @@ project(seismograph)
 set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory("modules/katla/app-kit/")
-add_subdirectory("modules/katla/renderer/")
+add_subdirectory("modules/katla/gpu/")
 
 include(FindPkgConfig)
 pkg_check_modules(GL REQUIRED gl)
 
 find_package(glfw3 3.2.0 REQUIRED)
 
-SET (skia_path $ENV{SKIA_PATH})
-
-if (NOT DEFINED skia_path)
-    SET(skia_path ${skia_env_path})
-endif()
-
+SET (skia_path ${PROJECT_SOURCE_DIR}/modules/katla/external/skia)
 set (skia_include_base_path ${skia_path}/include)
 
 set (skia_include_directories
@@ -38,9 +33,9 @@ target_include_directories(seismograph PRIVATE
     .
     modules/katla
     modules/katla/gui-kit/
-    modules/katla/renderer/
+    modules/katla/gpu/
     modules/katla/external/
     ${skia_include_directories}
 )
 
-target_link_libraries(seismograph katla-appkit katla-renderer glfw ${GL_LIBRARIES} ${skia})
+target_link_libraries(seismograph katla-appkit katla-gpu glfw ${GL_LIBRARIES} ${skia})

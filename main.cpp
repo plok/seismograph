@@ -1,8 +1,8 @@
-#include "gpu/opengl/opengl.h"
+#include "gpu/backend/opengl/opengl.h"
 
 #include "gui-kit/window/window-factory.h"
 
-#include "drawing/skia-opengl.h"
+#include "gpu/drawing/skia-opengl.h"
 
 #include "app-kit/timer-uv.h"
 #include "app-kit/event-loop-uv.h"
