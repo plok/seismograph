@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory("modules/katla/app-kit/")
 add_subdirectory("modules/katla/gpu/")
+add_subdirectory("modules/katla/gui-kit/")
+
 
 include(FindPkgConfig)
 pkg_check_modules(GL REQUIRED gl)
@@ -25,12 +27,14 @@ set (skia_include_directories
 
 set(sources
     main.cpp
+    seismo-render-view.cpp
 )
 
 add_executable(seismograph ${sources})
 
 target_include_directories(seismograph PRIVATE
     .
+    modules/
     modules/katla
     modules/katla/gui-kit/
     modules/katla/gpu/
@@ -38,4 +42,4 @@ target_include_directories(seismograph PRIVATE
     ${skia_include_directories}
 )
 
-target_link_libraries(seismograph katla-appkit katla-gpu glfw ${GL_LIBRARIES} ${skia})
+target_link_libraries(seismograph katla-guikit katla-appkit katla-gpu glfw ${GL_LIBRARIES} ${skia})

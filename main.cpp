@@ -1,8 +1,11 @@
 #include "gpu/backend/opengl/opengl.h"
 
-#include "gui-kit/window/window-factory.h"
+#include "gpu/window/window.h"
+#include "gpu/window/window-factory.h"
 
-#include "gpu/drawing/skia-opengl.h"
+#include "gpu/drawing/skia-render-view.h"
+
+#include "gui-kit/gui-kit.h"
 
 #include "app-kit/timer-uv.h"
 #include "app-kit/event-loop-uv.h"
@@ -10,25 +13,14 @@
 
 #include "app-kit/core-application.h"
 
+#include "seismo-render-view.h"
+
 #include "string.h"
 #include <iostream>
 #include <vector>
 
 // TODO remove
 #include <GLFW/glfw3.h>
-
-std::tuple<std::unique_ptr<GraphicsBackend>, ErrorPtr> initializeGraphicsBackend() {
-
-    std::cout << "Creating opengl backend!" << std::endl;
-    
-    auto opengl = std::make_unique<OpenGl>();
-    auto error = opengl->init();
-    if (error) {
-        return {std::unique_ptr<GraphicsBackend>(), Error::create("Failed initializing opengl backend: " + error->message)};
-    }
-
-    return {std::unique_ptr<GraphicsBackend>(std::move(opengl)), Error::none()};
-}
 
 int main(int argc, char* argv[])
 {    
@@ -40,45 +32,24 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    auto [graphicsBackend, backendError] = initializeGraphicsBackend();
-    if (backendError) {
-        std::cout << "Failed initializing graphics backend" << backendError->message;
-        return -1;
-    }
+    GuiKit guiKit(app);
+    guiKit.init();
 
-    // before we can create a surface we need to create a window
-    auto windowFactory = graphicsBackend->windowFactory();
-    auto windowEvents = std::make_shared<WindowEvents>();
+    // TODO no shared_ptr
+    auto windowProperties = std::make_shared<WindowProperties>();
+    windowProperties->size.width = 800;
+    windowProperties->size.height = 600;
+    windowProperties->title = "Hello!";
 
-    auto [window, createError] = windowFactory->create(800, 600, "Hello!", windowEvents);
-    if (createError) {
-        std::cout << "Failed creating window" << createError->message;
-        return -1;
-    }
+    auto renderView = std::make_shared<SeismoRenderView>();
 
-    auto timer = app.createTimer();
-
-    windowEvents->closeRequested = std::make_shared<FuncObserver<bool>>([&app, &timer, &window](bool) {
-        std::cout << "close event!" << std::endl << std::flush;
-
-        timer->stop();
-        app.close();
-    });
-
-    auto initDeviceError = graphicsBackend->initDevice();
-
-    window->init();
-    window->show();
-
+    auto window = guiKit.createWindow(windowProperties, renderView);
     
-    SkiaOpenGL skia;
-    skia.init();
-    skia.draw();
-    window->render();
-
-    timer->start(17, [&skia, &window]() {
-        skia.draw();
+    auto timer = app.createTimer();
+    
+    timer->start(17, [&window]() {
         window->render();
+        window->processEvents();
     });
 
     error = app.run();
@@ -87,7 +58,7 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    graphicsBackend->cleanup();
+    guiKit.close();
     window->close();
 
     return 0;
