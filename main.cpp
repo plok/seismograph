@@ -3,8 +3,6 @@
 #include "gpu/window/window.h"
 #include "gpu/window/window-factory.h"
 
-#include "gpu/drawing/skia-render-view.h"
-
 #include "gui-kit/gui-kit.h"
 
 #include "app-kit/timer-uv.h"
@@ -18,9 +16,6 @@
 #include "string.h"
 #include <iostream>
 #include <vector>
-
-// TODO remove
-#include <GLFW/glfw3.h>
 
 int main(int argc, char* argv[])
 {    

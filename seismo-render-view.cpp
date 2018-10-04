@@ -22,51 +22,15 @@ SeismoRenderView::SeismoRenderView()
 
 void SeismoRenderView::init()
 {
-    auto interface = GrGLMakeNativeInterface();
-    
-    m_context = GrContext::MakeGL(interface);
-    
-    int width = 800;
-    int height = 600;
+    _skia.init();
 
-    // Get the current draw framebuffer 
-    GLint drawFboId = 0;
-    glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &drawFboId);
-
-
-    GrGLFramebufferInfo info;
-    info.fFBOID = (GrGLuint) drawFboId;
-    
-
-    // TODO: detect!
-    info.fFormat = GL_RGBA8;
-    SkColorType colorType = kRGBA_8888_SkColorType;
-    ///
-
-    // Create render target
-    GrBackendRenderTarget target(width, height, /*kMsaaSampleCount*/ 0, /*kStencilBits*/ 8, info);
-
-
-    SkSurfaceProps props(SkSurfaceProps::kLegacyFontHost_InitType);
-    
-
-    m_surface = sk_sp<SkSurface>(
-        SkSurface::MakeFromBackendRenderTarget(m_context.get(),
-                                            target,
-                                               kBottomLeft_GrSurfaceOrigin,
-                                               colorType,
-                                               nullptr,
-                                               &props));
-    if (!m_surface) {
-        SkDebugf("SkSurface::MakeRenderTarget returned null\n");
-        return;
-    }
-
+    _startTime = std::chrono::high_resolution_clock::now();
 }
 
 void SeismoRenderView::render()
 {
-    if (!m_surface) {
+    auto surface = _skia.surface();
+    if (!surface) {
         return;
     }
 
@@ -74,36 +38,74 @@ void SeismoRenderView::render()
 
     }
 
-    int width = m_surface->width();
-    int height = m_surface->height();
+    int width = surface->width();
+    int height = surface->height();
 
-    SkCanvas* canvas = m_surface->getCanvas();
+    SkCanvas* canvas = surface->getCanvas();
     
     canvas->clear(SK_ColorBLACK);
 
-    SkPaint paint;
-    paint.setColor(0x20FFFFFF);
+    SkPaint gridPaint;
+    gridPaint.setColor(0x20FFFFFF);
     
+    SkPaint foregroundPaint;
+    foregroundPaint.setColor(0xFFFFFFFF);
+
     const float gridSize = (float)width / 10.f;
 
-    auto time = std::chrono::high_resolution_clock::now();
-    auto msSinceEpoch = std::chrono::duration_cast<std::chrono::milliseconds>(time.time_since_epoch());
+    auto currentTime = std::chrono::high_resolution_clock::now();
+    auto timeSinceStart = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - _startTime);
     
-    auto offset = gridSize * ((msSinceEpoch.count() % 1000) / 1000.f);
+    auto timeInPeriod = ((timeSinceStart.count() % 1000) / 1000.f);
+    auto offset = gridSize * timeInPeriod;
     // std::cout << (msSinceEpoch.count() % 1000) << offset << std::endl;
     
     for(float x=0; x<width; x += gridSize) {
         SkPoint up {offset + x, 0};
         SkPoint down {offset + x, height-10.f};
         
-        canvas->drawLine(up, down, paint);
+        canvas->drawLine(up, down, gridPaint);
     }
     for(float y=0; y<height; y += gridSize) {
         SkPoint left {0, y};
         SkPoint right {width-10.f, y};
         
-        canvas->drawLine(left, right, paint);
+        canvas->drawLine(left, right, gridPaint);
     }  
+
+    float timeScale = (1000.f/gridSize)/((float)M_PI);
+    float t = timeScale * ((float)timeSinceStart.count()/1000.f);
+
+    float timespan = (1.f / 0.017) * 10; 
+
+    auto ampl = (float)height/2;
+    auto yOffset = ampl;
+    auto value = ampl * sin(t) + yOffset;
+
+    _buffer.push_front(value);
+    if (_buffer.size() > 600) {
+        _buffer.pop_back();
+    }
+
+    float lastX = 0;
+    float lastY = 0;
+    for(float t=0; t<_buffer.size(); t++) {
+        if (t >= _buffer.size()) {
+            continue;
+        }
+
+        auto x = t * (width/timespan);
+        auto y = (float)_buffer[t];
+
+        if (t>0) {
+            SkPoint last {lastX, lastY};
+            SkPoint point {x, y};
+            canvas->drawLine(last, point, foregroundPaint);
+        }
+
+        lastX = x;
+        lastY = y;
+    }
 
     canvas->flush();
 }

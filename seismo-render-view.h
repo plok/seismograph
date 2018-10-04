@@ -1,13 +1,11 @@
 #ifndef SEISMO_RENDER_VIEW_H
 #define SEISMO_RENDER_VIEW_H
 
-// TODO drawing -> render
-#include "katla/gpu/drawing/render-view.h"
-
-#include "core/SkSurface.h"
-#include "gpu/GrContext.h"
+#include "katla/gpu/render/render-view.h"
+#include "modules/katla/gpu/render/skia-opengl-binder.h"
 
 #include <chrono>
+#include <deque>
 
 class SeismoRenderView : public RenderView
 {
@@ -21,11 +19,13 @@ public:
     void resize(int width, int height);
 
 private:
-    sk_sp<GrContext> m_context;
-    sk_sp<SkSurface> m_surface;
+    SkiaOpenGlBinder _skia;
 
     bool _lastRenderValid;
+    std::chrono::high_resolution_clock::time_point _startTime;
     std::chrono::high_resolution_clock::time_point _gridTime;
+
+    std::deque<double> _buffer;
 };
 
 #endif
