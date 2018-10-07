@@ -11,8 +11,10 @@
 
 #include "app-kit/core-application.h"
 
-#include "seismo-render-view.h"
+#include "rxcpp/rx.hpp"
 
+#include "seismo-render-view.h"
+#include "audio/device-manager.h"
 #include "string.h"
 #include <iostream>
 #include <vector>
@@ -26,7 +28,15 @@ int main(int argc, char* argv[])
         std::cout << error->name << " " << error->message << std::endl << std::flush;
         return -1;
     }
+    auto values1 = rxcpp::observable<>::range(1, 5);
+    // JORRIT HACKS
+    values1.
+        subscribe(
+            [](int v){printf("OnNext: %d\n", v);},
+            [](){printf("OnCompleted\n");});
 
+    auto dm = new DeviceManager();
+    //
     GuiKit guiKit(app);
     guiKit.init();
 
