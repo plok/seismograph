@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "gpu/backend/opengl/opengl.h"
 
 #include "gpu/window/window.h"
@@ -5,21 +7,17 @@
 
 #include "gui-kit/gui-kit.h"
 
-#include "app-kit/timer-uv.h"
-#include "app-kit/event-loop-uv.h"
-#include "app-kit/signal-handler-uv.h"
-
 #include "app-kit/core-application.h"
 
 #include "rxcpp/rx.hpp"
 
 #include "seismo-render-view.h"
+
 #include "audio/device-manager.h"
 #include "string.h"
-#include <iostream>
 #include <vector>
 
-int main(int argc, char* argv[])
+int main(int /*argc*/, char* /*argv[]*/)
 {    
     CoreApplication app;
 
