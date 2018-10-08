@@ -9,7 +9,7 @@
 
 #include "app-kit/core-application.h"
 
-#include "rxcpp/rx.hpp"
+//#include "rxcpp/rx.hpp"
 
 #include "seismo-render-view.h"
 
@@ -17,7 +17,7 @@
 #include "string.h"
 #include <vector>
 
-int main(int /*argc*/, char* /*argv[]*/)
+int main(int /*argc*/, char** /*argv[]*/)
 {    
     CoreApplication app;
 
@@ -26,12 +26,12 @@ int main(int /*argc*/, char* /*argv[]*/)
         std::cout << error->name << " " << error->message << std::endl << std::flush;
         return -1;
     }
-    auto values1 = rxcpp::observable<>::range(1, 5);
+//    auto values1 = rxcpp::observable<>::range(1, 5);
     // JORRIT HACKS
-    values1.
-        subscribe(
-            [](int v){printf("OnNext: %d\n", v);},
-            [](){printf("OnCompleted\n");});
+//    values1.
+//        subscribe(
+//            [](int v){printf("OnNext: %d\n", v);},
+//            [](){printf("OnCompleted\n");});
 
     auto dm = new DeviceManager();
     //
