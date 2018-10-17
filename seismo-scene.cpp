@@ -1,19 +1,19 @@
-#include "seismo-render-view.h"
+#include "seismo-scene.h"
 
 #include "core/SkCanvas.h"
 
-SeismoRenderView::SeismoRenderView() :
+SeismoScene::SeismoScene() :
     _lastRenderValid(false)
 {}
 
-void SeismoRenderView::init()
+void SeismoScene::init()
 {
     _skia.init();
 
     _startTime = std::chrono::high_resolution_clock::now();
 }
 
-void SeismoRenderView::render()
+void SeismoScene::render()
 {
     auto surface = _skia.surface();
     if (!surface) {
@@ -99,12 +99,12 @@ void SeismoRenderView::render()
     canvas->flush();
 }
 
-void SeismoRenderView::resize(int /*width*/, int /*height*/)
+void SeismoScene::resize(int /*width*/, int /*height*/)
 {
     //render();
 }
 
-void SeismoRenderView::cleanup()
+void SeismoScene::cleanup()
 {
     // TODO?
 }

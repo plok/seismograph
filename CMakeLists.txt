@@ -30,7 +30,7 @@ set (skia_include_directories
 
 set(sources
     main.cpp
-    seismo-render-view.cpp
+        seismo-scene.cpp
     audio/device-manager.cpp
 )
 

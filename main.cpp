@@ -11,7 +11,8 @@
 
 //#include "rxcpp/rx.hpp"
 
-#include "seismo-render-view.h"
+#include "seismo-scene.h"
+#include "imgui-scene.h"
 
 #include "audio/device-manager.h"
 #include "string.h"
@@ -44,7 +45,13 @@ int main(int /*argc*/, char** /*argv[]*/)
     windowProperties->size.height = 600;
     windowProperties->title = "Hello!";
 
-    auto renderView = std::make_shared<SeismoRenderView>();
+    auto renderView = std::make_shared<RenderView>();
+
+    auto seismoScene = std::make_shared<SeismoScene>();
+    auto imGuiScene = std::make_shared<ImGuiScene>(renderView->renderStats());
+
+    renderView->addScene(seismoScene);
+    renderView->addScene(imGuiScene);
 
     auto window = guiKit.createWindow(windowProperties, renderView);
     

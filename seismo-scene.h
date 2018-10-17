@@ -1,5 +1,5 @@
-#ifndef SEISMO_RENDER_VIEW_H
-#define SEISMO_RENDER_VIEW_H
+#ifndef SEISMO_SCENE_H
+#define SEISMO_SCENE_H
 
 #include "katla/gpu/render/render-view.h"
 #include "modules/katla/gpu/render/skia-opengl-binder.h"
@@ -7,16 +7,16 @@
 #include <chrono>
 #include <deque>
 
-class SeismoRenderView : public RenderView
+class SeismoScene : public Scene
 {
 public:
-    SeismoRenderView();
+    SeismoScene();
 
-    void init();
-    void render();
-    void cleanup();
+    void init() override;
+    void render() override;
+    void cleanup() override;
 
-    void resize(int width, int height);
+    void resize(int width, int height) override;
 
 private:
     SkiaOpenGlBinder _skia;
