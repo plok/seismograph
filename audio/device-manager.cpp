@@ -1,7 +1,7 @@
 #include "device-manager.h"
 #include <iostream>
 #define SAMPLE_RATE  (44100)
-#define FRAMES_PER_BUFFER (1024)
+#define FRAMES_PER_BUFFER (512)
 
 DeviceManager::DeviceManager() {
 

@@ -80,7 +80,7 @@ void SeismoScene::render()
     this->deviceManager.read(&audio);
 
     for (int a=0; a < audio.size(); a++) {
-        auto x = (float)a;
+        auto x = (float)(1024/width)*a;
         auto y = (float)audio[a] * amplitude + yOffset; 
         SkPoint sample {x, y};
         canvas->drawPoint(sample, foregroundPaint);
