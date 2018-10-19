@@ -15,6 +15,9 @@ pkg_check_modules(GL REQUIRED gl)
 find_package(glfw3 3.2.0 REQUIRED)
 find_package(rxcpp REQUIRED)
 find_package(portaudio REQUIRED)
+find_package(Boost COMPONENTS system REQUIRED)
+include_directories(${Boost_INCLUDE_DIR})
+link_directories(${Boost_LIBRARY_DIR})
 
 SET (skia_path ${PROJECT_SOURCE_DIR}/modules/katla/external/skia)
 set (skia_include_base_path ${skia_path}/include)
@@ -47,4 +50,4 @@ target_include_directories(seismograph PRIVATE
     ${PORTAUDIO_INCLUDE_DIR}
 )
 
-target_link_libraries(seismograph katla-guikit katla-appkit katla-gpu glfw ${GL_LIBRARIES} ${skia} ${PORTAUDIO_LIBRARIES})
+target_link_libraries(seismograph katla-guikit katla-appkit katla-gpu glfw ${GL_LIBRARIES} ${skia} ${PORTAUDIO_LIBRARIES} ${Boost_LIBRARIES})

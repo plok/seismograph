@@ -76,6 +76,16 @@ void SeismoScene::render()
         _buffer.pop_back();
     }
 
+    std::vector<float> audio(1024);
+    this->deviceManager.read(&audio);
+
+    for (int a=0; a < audio.size(); a++) {
+        auto x = (float)a;
+        auto y = (float)audio[a] * amplitude + yOffset; 
+        SkPoint sample {x, y};
+        canvas->drawPoint(sample, foregroundPaint);
+    }
+
     float lastX = 0;
     float lastY = 0;
     for(int i=0; i<_buffer.size(); i++) {
