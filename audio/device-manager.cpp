@@ -1,7 +1,7 @@
 #include "device-manager.h"
 #include <iostream>
 #define SAMPLE_RATE  (44100)
-#define FRAMES_PER_BUFFER (512)
+#define FRAMES_PER_BUFFER (1024)
 
 /***
  * Static functions
@@ -9,7 +9,7 @@
 int DeviceManager::streamCallback(const void *input, void *output, unsigned long frameCount,
                                   const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags,
                                   void *userData) {
-    return  ((DeviceManager*)userData)->memberStreamCallback(input, output, frameCount,timeInfo, statusFlags);
+    return  ((DeviceManager*)userData)->memberStreamCallback(input, output, frameCount, timeInfo, statusFlags);
 }
 /****/
 
@@ -84,16 +84,17 @@ void DeviceManager::startStream() {
 
 void DeviceManager::read(std::vector<double>& data) {
     if ( Pa_IsStreamActive(_stream) == 1) {
-        size_t num_read = 0;
-//        while (auto a = _ringbuffer.pop(data->data() + num_read, data->size() - num_read)) {
-//            num_read += a;
-//            if (num_read >= 1024) {
-//                break;
-//            }
-//        }
+  //      size_t num_read = 0;
+       // while (auto a = _ringbuffer.pop(data.data() + num_read, data->size() - num_read)) {
+       //     num_read += a;
+       //    if (num_read >= 1024) {
+       //         break;
+       //     }
+       // }
 
         _ringbuffer.consume_all([&data](double sample) {
             data.push_back(sample);
         });
+
     }
 }

@@ -32,12 +32,12 @@ void SeismoScene::render()
     int height = surface->height();
 
     SkCanvas* canvas = surface->getCanvas();
-    
+
     canvas->clear(SK_ColorBLACK);
 
     SkPaint gridPaint;
     gridPaint.setColor(0x20FFFFFF);
-    
+
     SkPaint foregroundPaint;
     foregroundPaint.setColor(0xFFFFFFFF);
 
@@ -45,7 +45,7 @@ void SeismoScene::render()
 
     auto currentTime = std::chrono::high_resolution_clock::now();
     auto timeSinceStart = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - _startTime);
-    
+
     auto timeInPeriod = ((timeSinceStart.count() % 1000) / 1000.f);
     auto offset = gridSize * timeInPeriod;
 
@@ -54,7 +54,7 @@ void SeismoScene::render()
 
         SkPoint up {offset + fx, 0};
         SkPoint down {offset + fx, height-10.f};
-        
+
         canvas->drawLine(up, down, gridPaint);
     }
     for(int y=0; y<height; y += gridSize) {
@@ -62,7 +62,7 @@ void SeismoScene::render()
 
         SkPoint left {0, fy};
         SkPoint right {width-10.f, fy};
-        
+
         canvas->drawLine(left, right, gridPaint);
     }  
 
@@ -84,9 +84,15 @@ void SeismoScene::render()
     audio.reserve(1024);
     this->deviceManager.read(audio);
 
-//    double pitch = get_pitch_autocorrelation(audio, 44100);
-//    std::cout << "Pitch: " << pitch << " nr of samples: " << audio.size() << std::endl;
-
+    std::cout << "size:" << audio.size() << std::endl;
+    if (audio.size() >= 1024) {
+        double pitch = get_pitch_mpm(audio, 44100);
+        std::cout << pitch << std::endl;
+        auto xp = t * (width/timeSpan);
+        auto yp = (float)pitch;
+        SkPoint pitchPoint {xp, yp};
+        canvas->drawPoint(pitchPoint ,foregroundPaint);
+    }
 
     for (int a=0; a < audio.size(); a++) {
         auto x = (float)(1024/width)*a;
@@ -100,8 +106,8 @@ void SeismoScene::render()
             continue;
         }
 
-       auto x = (float)i * (width/timeSpan);
-       auto y = (float)_buffer[i];
+        auto x = (float)i * (width/timeSpan);
+        auto y = (float)_buffer[i];
 
         if (t>0) {
             SkPoint point {x, y};
@@ -121,4 +127,4 @@ void SeismoScene::cleanup()
 {
     // TODO?
 }
-    
+
