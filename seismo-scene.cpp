@@ -2,6 +2,10 @@
 
 #include "core/SkCanvas.h"
 
+#include "externals/pitch-detection/include/pitch_detection.h"
+
+#include <iostream>
+
 SeismoScene::SeismoScene() :
     _lastRenderValid(false)
 {}
@@ -76,18 +80,21 @@ void SeismoScene::render()
         _buffer.pop_back();
     }
 
-    std::vector<float> audio(1024);
-    this->deviceManager.read(&audio);
+    std::vector<double> audio;
+    audio.reserve(1024);
+    this->deviceManager.read(audio);
+
+//    double pitch = get_pitch_autocorrelation(audio, 44100);
+//    std::cout << "Pitch: " << pitch << " nr of samples: " << audio.size() << std::endl;
+
 
     for (int a=0; a < audio.size(); a++) {
         auto x = (float)(1024/width)*a;
-        auto y = (float)audio[a] * amplitude + yOffset; 
+        auto y = (float)audio[a] * amplitude + yOffset;
         SkPoint sample {x, y};
         canvas->drawPoint(sample, foregroundPaint);
     }
 
-    float lastX = 0;
-    float lastY = 0;
     for(int i=0; i<_buffer.size(); i++) {
         if (i >= _buffer.size()) {
             continue;
@@ -97,13 +104,9 @@ void SeismoScene::render()
        auto y = (float)_buffer[i];
 
         if (t>0) {
-            SkPoint last {lastX, lastY};
             SkPoint point {x, y};
-            canvas->drawLine(last, point, foregroundPaint);
+            canvas->drawPoint(point, foregroundPaint);
         }
-
-        lastX = x;
-        lastY = y;
     }
 
     canvas->flush();

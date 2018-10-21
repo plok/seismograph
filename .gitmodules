@@ -1,3 +1,9 @@
 [submodule "modules/katla"]
 	path = modules/katla
 	url = https://github.com/plok/katla.git
+[submodule "externals/pitch-detection"]
+	path = externals/pitch-detection
+	url = https://github.com/sevagh/pitch-detection.git
+[submodule "externals/ffts"]
+	path = externals/ffts
+	url = https://github.com/anthonix/ffts.git

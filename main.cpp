@@ -34,7 +34,6 @@ int main(int /*argc*/, char** /*argv[]*/)
 //            [](int v){printf("OnNext: %d\n", v);},
 //            [](){printf("OnCompleted\n");});
 
-    auto dm = new DeviceManager();
     //
     GuiKit guiKit(app);
     guiKit.init();
