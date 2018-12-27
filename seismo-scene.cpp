@@ -47,7 +47,7 @@ void SeismoScene::render()
     auto timeSinceStart = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - _startTime);
 
     auto timeInPeriod = ((timeSinceStart.count() % 1000) / 1000.f);
-    auto offset = gridSize * timeInPeriod;
+    auto offset = -1.f * gridSize * timeInPeriod;
 
     for(int x=0; x<width; x += gridSize) {
         auto fx = static_cast<float>(x);
@@ -73,25 +73,19 @@ void SeismoScene::render()
 
     auto amplitude = (float)height/2;
     auto yOffset = amplitude;
-    auto value = amplitude * sin(t) + yOffset;
-
-    _buffer.push_front(value);
-    if (_buffer.size() > 600) {
-        _buffer.pop_back();
-    }
 
     std::vector<double> audio;
     audio.reserve(1024);
     this->deviceManager.read(audio);
 
-    std::cout << "size:" << audio.size() << std::endl;
+    double pitch = 0.f;
     if (audio.size() >= 1024) {
-        double pitch = get_pitch_mpm(audio, 44100);
-        std::cout << pitch << std::endl;
-        auto xp = t * (width/timeSpan);
-        auto yp = (float)pitch;
-        SkPoint pitchPoint {xp, yp};
-        canvas->drawPoint(pitchPoint ,foregroundPaint);
+        pitch = get_pitch_mpm(audio, 44100);
+    }
+
+    _buffer.push_front(pitch);
+    if (_buffer.size() > 1000) {
+        _buffer.pop_back();
     }
 
     for (int a=0; a < audio.size(); a++) {
@@ -106,8 +100,8 @@ void SeismoScene::render()
             continue;
         }
 
-        auto x = (float)i * (width/timeSpan);
-        auto y = (float)_buffer[i];
+        auto x = width - ((float)i * (width/timeSpan));
+        auto y = height - (float)_buffer[i];
 
         if (t>0) {
             SkPoint point {x, y};
