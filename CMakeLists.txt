@@ -3,9 +3,10 @@ project(seismograph)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_subdirectory("modules/katla/app-kit/")
-add_subdirectory("modules/katla/gpu/")
-add_subdirectory("modules/katla/gui-kit/")
+add_subdirectory(modules/katla/external/skia/skia-cmake)
+add_subdirectory(modules/katla/app-kit/)
+add_subdirectory(modules/katla/gpu/)
+add_subdirectory(modules/katla/gui-kit/)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
 
@@ -19,21 +20,10 @@ find_package(Boost COMPONENTS system REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIR} externals/pitch-detection/lib externals/ffts/build)
 
-SET (skia_path ${PROJECT_SOURCE_DIR}/modules/katla/external/skia)
-set (skia_include_base_path ${skia_path}/include)
-
-set (skia_include_directories
-    ${skia_include_base_path}
-    ${skia_include_base_path}/core
-    ${skia_include_base_path}/config
-    ${skia_include_base_path}/gpu
-    ${skia_include_base_path}/utils
-    ${skia_include_base_path}/private
-)
-
 set(sources
     main.cpp
-        seismo-scene.cpp
+    seismo-scene.cpp
+    imgui-scene.cpp
     audio/device-manager.cpp
 )
 
@@ -46,8 +36,8 @@ target_include_directories(seismograph PRIVATE
     modules/katla/gui-kit/
     modules/katla/gpu/
     modules/katla/external/
-    ${skia_include_directories}
+    modules/katla/external/imgui
     ${PORTAUDIO_INCLUDE_DIR}
 )
 
-target_link_libraries(seismograph katla-guikit katla-appkit katla-gpu glfw ${GL_LIBRARIES} ${skia} ${PORTAUDIO_LIBRARIES} ${Boost_LIBRARIES} pitch_detection ffts)
+target_link_libraries(seismograph katla-guikit katla-appkit katla-gpu glfw ${GL_LIBRARIES} skia ${PORTAUDIO_LIBRARIES} ${Boost_LIBRARIES} pitch_detection ffts)
